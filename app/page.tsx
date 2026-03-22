@@ -6,6 +6,7 @@ import ClientList from "@/components/ClientList";
 import TaskList from "@/components/TaskList";
 import TaskFilters from "@/components/TaskFilters";
 import AddTaskModal from "@/components/AddTaskModal";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -258,7 +259,7 @@ export default function Home() {
         )}
 
         {/* Task list */}
-        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-5" style={{ minHeight: 0 }}>
           {!selectedClient && !clientsLoading ? (
             <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
               <div
@@ -280,6 +281,8 @@ export default function Home() {
             <TaskList tasks={filteredTasks} loading={tasksLoading} onStatusChange={handleStatusChange} />
           )}
         </div>
+
+        <Footer />
       </main>
 
       {showAddModal && selectedClient && (
