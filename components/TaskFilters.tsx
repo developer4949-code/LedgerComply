@@ -24,7 +24,8 @@ export default function TaskFilters({
       {/* Search */}
       <div className="relative flex-1 min-w-[180px]">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+          style={{ color: "var(--pink-primary)" }}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -36,7 +37,7 @@ export default function TaskFilters({
           placeholder="Search tasks..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+          className="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-xl"
         />
       </div>
 
@@ -44,13 +45,11 @@ export default function TaskFilters({
       <select
         value={statusFilter}
         onChange={(e) => onStatusChange(e.target.value)}
-        className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent text-slate-700"
+        className="input-dark text-sm rounded-xl px-3 py-2"
       >
         <option value="">All Statuses</option>
         {TASK_STATUSES.map((s: TaskStatus) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
+          <option key={s} value={s}>{s}</option>
         ))}
       </select>
 
@@ -58,13 +57,11 @@ export default function TaskFilters({
       <select
         value={categoryFilter}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent text-slate-700"
+        className="input-dark text-sm rounded-xl px-3 py-2"
       >
         <option value="">All Categories</option>
         {TASK_CATEGORIES.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
+          <option key={c} value={c}>{c}</option>
         ))}
       </select>
     </div>

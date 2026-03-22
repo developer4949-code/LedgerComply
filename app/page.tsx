@@ -19,7 +19,6 @@ export default function Home() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Fetch clients on mount
   useEffect(() => {
     async function loadClients() {
       try {
@@ -36,7 +35,6 @@ export default function Home() {
     loadClients();
   }, []);
 
-  // Fetch tasks when selected client changes
   const loadTasks = useCallback(async (clientId: string) => {
     setTasksLoading(true);
     try {
@@ -89,9 +87,7 @@ export default function Home() {
         searchQuery &&
         !task.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
         !task.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        return false;
-      }
+      ) return false;
       return true;
     });
   }, [tasks, statusFilter, categoryFilter, searchQuery]);
@@ -99,75 +95,101 @@ export default function Home() {
   const stats = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const total = tasks.length;
-    const pending = tasks.filter((t) => t.status === "Pending").length;
-    const inProgress = tasks.filter((t) => t.status === "In Progress").length;
-    const completed = tasks.filter((t) => t.status === "Completed").length;
-    const overdue = tasks.filter(
-      (t) => t.status !== "Completed" && new Date(t.due_date) < today
-    ).length;
-    return { total, pending, inProgress, completed, overdue };
+    return {
+      total: tasks.length,
+      pending: tasks.filter((t) => t.status === "Pending").length,
+      inProgress: tasks.filter((t) => t.status === "In Progress").length,
+      completed: tasks.filter((t) => t.status === "Completed").length,
+      overdue: tasks.filter(
+        (t) => t.status !== "Completed" && new Date(t.due_date) < today
+      ).length,
+    };
   }, [tasks]);
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex h-screen mesh-bg overflow-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-20 md:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-20 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* ── Sidebar ── */}
       <aside
-        className={`fixed md:relative z-30 md:z-auto h-full w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
+        className={`fixed md:relative z-30 md:z-auto h-full w-72 flex flex-col transition-transform duration-300 border-r
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        `}
+        style={{
+          background: "linear-gradient(180deg, #080814 0%, #05050d 100%)",
+          borderColor: "rgba(233,30,140,0.15)",
+        }}
       >
-        <div className="flex items-center justify-between px-4 py-4 border-b border-slate-200">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Logo */}
+        <div className="flex items-center justify-between px-5 py-5 border-b" style={{ borderColor: "rgba(233,30,140,0.12)" }}>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center animate-float"
+              style={{
+                background: "linear-gradient(135deg, #e91e8c, #c2185b)",
+                boxShadow: "0 0 20px rgba(233,30,140,0.5)",
+              }}
+            >
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <span className="font-bold text-slate-800 text-base">LedgerComply</span>
+            <div>
+              <span className="font-bold text-base gradient-text">LedgerComply</span>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Compliance Tracker</p>
+            </div>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden text-slate-400 hover:text-slate-600"
-          >
-            ✕
-          </button>
+            className="md:hidden text-pink-400 hover:text-pink-300 transition-colors"
+          >✕</button>
         </div>
 
-        <div className="px-4 py-3 border-b border-slate-100">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            Clients ({clients.length})
+        {/* Client count */}
+        <div className="px-5 py-3 border-b" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--pink-primary)" }}>
+            Clients — {clients.length}
           </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto scrollbar-thin">
+        {/* Client list */}
+        <div className="flex-1 overflow-y-auto">
           <ClientList
             clients={clients}
             selectedClientId={selectedClient?.id ?? null}
-            onSelect={(c) => {
-              setSelectedClient(c);
-              setSidebarOpen(false);
-            }}
+            onSelect={(c) => { setSelectedClient(c); setSidebarOpen(false); }}
             loading={clientsLoading}
           />
         </div>
+
+        {/* Bottom glow line */}
+        <div
+          className="h-px w-full"
+          style={{ background: "linear-gradient(90deg, transparent, var(--pink-primary), transparent)" }}
+        />
       </aside>
 
-      {/* Main content */}
+      {/* ── Main content ── */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="bg-white border-b border-slate-200 px-4 md:px-6 py-4 flex items-center gap-3">
+        <header
+          className="border-b px-4 md:px-6 py-4 flex items-center gap-3"
+          style={{
+            background: "rgba(8,8,20,0.9)",
+            backdropFilter: "blur(12px)",
+            borderColor: "rgba(233,30,140,0.12)",
+          }}
+        >
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden text-slate-500 hover:text-slate-700"
+            className="md:hidden transition-colors"
+            style={{ color: "var(--pink-primary)" }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -176,26 +198,26 @@ export default function Home() {
 
           <div className="flex-1 min-w-0">
             {selectedClient ? (
-              <>
-                <h1 className="font-bold text-slate-800 text-lg leading-none truncate">
+              <div className="animate-fade-in">
+                <h1 className="font-bold text-lg leading-none truncate" style={{ color: "var(--text-primary)" }}>
                   {selectedClient.company_name}
                 </h1>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
                   {selectedClient.entity_type} · {selectedClient.country}
                 </p>
-              </>
+              </div>
             ) : (
-              <h1 className="font-bold text-slate-800 text-lg">Select a client</h1>
+              <h1 className="font-bold text-lg" style={{ color: "var(--text-secondary)" }}>Select a client</h1>
             )}
           </div>
 
           {selectedClient && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm"
+              className="btn-glow flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-xl"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
               </svg>
               <span className="hidden sm:inline">Add Task</span>
             </button>
@@ -204,20 +226,26 @@ export default function Home() {
 
         {/* Stats bar */}
         {selectedClient && !tasksLoading && (
-          <div className="bg-white border-b border-slate-100 px-4 md:px-6 py-3 flex items-center gap-4 overflow-x-auto">
-            <StatPill label="Total" value={stats.total} color="text-slate-600 bg-slate-100" />
-            <StatPill label="Pending" value={stats.pending} color="text-yellow-700 bg-yellow-50" />
-            <StatPill label="In Progress" value={stats.inProgress} color="text-blue-700 bg-blue-50" />
-            <StatPill label="Completed" value={stats.completed} color="text-green-700 bg-green-50" />
+          <div
+            className="border-b px-4 md:px-6 py-3 flex items-center gap-3 overflow-x-auto"
+            style={{ background: "rgba(5,5,13,0.7)", borderColor: "rgba(233,30,140,0.08)" }}
+          >
+            <StatPill label="Total" value={stats.total} color="#a0a0c0" bg="rgba(255,255,255,0.05)" delay={0} />
+            <StatPill label="Pending" value={stats.pending} color="#fbbf24" bg="rgba(251,191,36,0.08)" delay={1} />
+            <StatPill label="In Progress" value={stats.inProgress} color="#60a5fa" bg="rgba(96,165,250,0.08)" delay={2} />
+            <StatPill label="Completed" value={stats.completed} color="#34d399" bg="rgba(52,211,153,0.08)" delay={3} />
             {stats.overdue > 0 && (
-              <StatPill label="Overdue" value={stats.overdue} color="text-red-700 bg-red-50" />
+              <StatPill label="Overdue" value={stats.overdue} color="#f43f5e" bg="rgba(244,63,94,0.12)" delay={4} />
             )}
           </div>
         )}
 
         {/* Filters */}
         {selectedClient && (
-          <div className="px-4 md:px-6 py-3 bg-slate-50 border-b border-slate-200">
+          <div
+            className="px-4 md:px-6 py-3 border-b"
+            style={{ background: "rgba(5,5,13,0.5)", borderColor: "rgba(255,255,255,0.04)" }}
+          >
             <TaskFilters
               statusFilter={statusFilter}
               categoryFilter={categoryFilter}
@@ -230,27 +258,30 @@ export default function Home() {
         )}
 
         {/* Task list */}
-        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-5">
           {!selectedClient && !clientsLoading ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
+              <div
+                className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 animate-float"
+                style={{
+                  background: "rgba(233,30,140,0.08)",
+                  border: "1px solid rgba(233,30,140,0.2)",
+                  boxShadow: "0 0 40px rgba(233,30,140,0.1)",
+                }}
+              >
+                <svg className="w-10 h-10" style={{ color: "var(--pink-primary)" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <p className="text-slate-600 font-medium">Select a client to view tasks</p>
+              <p className="font-semibold text-lg" style={{ color: "var(--text-secondary)" }}>Select a client</p>
+              <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Choose from the sidebar to view tasks</p>
             </div>
           ) : (
-            <TaskList
-              tasks={filteredTasks}
-              loading={tasksLoading}
-              onStatusChange={handleStatusChange}
-            />
+            <TaskList tasks={filteredTasks} loading={tasksLoading} onStatusChange={handleStatusChange} />
           )}
         </div>
       </main>
 
-      {/* Add Task Modal */}
       {showAddModal && selectedClient && (
         <AddTaskModal
           clientId={selectedClient.id}
@@ -263,18 +294,21 @@ export default function Home() {
 }
 
 function StatPill({
-  label,
-  value,
-  color,
+  label, value, color, bg, delay,
 }: {
-  label: string;
-  value: number;
-  color: string;
+  label: string; value: number; color: string; bg: string; delay: number;
 }) {
   return (
-    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${color}`}>
-      <span className="text-base font-bold">{value}</span>
-      <span className="font-medium opacity-75">{label}</span>
+    <div
+      className="flex items-center gap-2 px-3 py-1.5 rounded-xl whitespace-nowrap animate-count"
+      style={{
+        background: bg,
+        border: `1px solid ${color}30`,
+        animationDelay: `${delay * 80}ms`,
+      }}
+    >
+      <span className="text-lg font-bold" style={{ color }}>{value}</span>
+      <span className="text-xs font-medium" style={{ color: `${color}aa` }}>{label}</span>
     </div>
   );
 }

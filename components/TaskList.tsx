@@ -14,7 +14,7 @@ export default function TaskList({ tasks, loading, onStatusChange }: TaskListPro
     return (
       <div className="flex flex-col gap-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 rounded-xl bg-slate-200 animate-pulse" />
+          <div key={i} className="h-28 rounded-2xl skeleton" />
         ))}
       </div>
     );
@@ -22,22 +22,36 @@ export default function TaskList({ tasks, loading, onStatusChange }: TaskListPro
 
   if (tasks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center mb-3">
-          <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 animate-float"
+          style={{
+            background: "rgba(233,30,140,0.06)",
+            border: "1px solid rgba(233,30,140,0.15)",
+          }}
+        >
+          <svg
+            className="w-8 h-8"
+            style={{ color: "var(--text-muted)" }}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <p className="text-sm font-medium text-slate-600">No tasks found</p>
-        <p className="text-xs text-slate-400 mt-1">Try changing filters or add a new task</p>
+        <p className="font-semibold" style={{ color: "var(--text-secondary)" }}>No tasks found</p>
+        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Try adjusting filters or add a new task</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} onStatusChange={onStatusChange} />
+    <div className="flex flex-col gap-3 relative">
+      {tasks.map((task, idx) => (
+        <div key={task.id} style={{ animationDelay: `${idx * 50}ms` }}>
+          <TaskCard task={task} onStatusChange={onStatusChange} />
+        </div>
       ))}
     </div>
   );

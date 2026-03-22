@@ -9,12 +9,14 @@ interface ClientListProps {
   loading: boolean;
 }
 
-const ENTITY_COLORS: Record<string, string> = {
-  "Private Limited": "bg-blue-100 text-blue-700",
-  LLP: "bg-purple-100 text-purple-700",
-  "Partnership Firm": "bg-amber-100 text-amber-700",
-  "Sole Proprietorship": "bg-green-100 text-green-700",
+const ENTITY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  "Private Limited": { bg: "rgba(96,165,250,0.1)", text: "#60a5fa", border: "rgba(96,165,250,0.3)" },
+  "LLP":             { bg: "rgba(167,139,250,0.1)", text: "#a78bfa", border: "rgba(167,139,250,0.3)" },
+  "Partnership Firm":{ bg: "rgba(251,191,36,0.1)",  text: "#fbbf24", border: "rgba(251,191,36,0.3)" },
+  "Sole Proprietorship": { bg: "rgba(52,211,153,0.1)", text: "#34d399", border: "rgba(52,211,153,0.3)" },
 };
+
+const DEFAULT_COLOR = { bg: "rgba(233,30,140,0.1)", text: "#e91e8c", border: "rgba(233,30,140,0.3)" };
 
 export default function ClientList({
   clients,
@@ -26,7 +28,7 @@ export default function ClientList({
     return (
       <div className="flex flex-col gap-3 p-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-16 rounded-lg bg-slate-200 animate-pulse" />
+          <div key={i} className="h-16 rounded-xl skeleton" />
         ))}
       </div>
     );
@@ -34,33 +36,67 @@ export default function ClientList({
 
   return (
     <div className="flex flex-col gap-2 p-4">
-      {clients.map((client) => {
+      {clients.map((client, idx) => {
         const isSelected = client.id === selectedClientId;
-        const entityColor =
-          ENTITY_COLORS[client.entity_type] ?? "bg-slate-100 text-slate-600";
+        const ec = ENTITY_COLORS[client.entity_type] ?? DEFAULT_COLOR;
 
         return (
           <button
             key={client.id}
             onClick={() => onSelect(client)}
-            className={`w-full text-left rounded-lg p-3 border transition-all duration-150 ${
-              isSelected
-                ? "bg-indigo-600 border-indigo-600 text-white shadow-md"
-                : "bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm text-slate-800"
-            }`}
+            className="w-full text-left rounded-xl p-3 transition-all duration-200 card-3d animate-slide-left group"
+            style={{
+              animationDelay: `${idx * 60}ms`,
+              background: isSelected
+                ? "linear-gradient(135deg, rgba(233,30,140,0.25), rgba(194,24,91,0.15))"
+                : "rgba(255,255,255,0.03)",
+              border: isSelected
+                ? "1px solid rgba(233,30,140,0.6)"
+                : "1px solid rgba(255,255,255,0.06)",
+              boxShadow: isSelected
+                ? "0 0 20px rgba(233,30,140,0.25), inset 0 1px 0 rgba(255,255,255,0.1)"
+                : "none",
+            }}
+            onMouseEnter={(e) => {
+              if (!isSelected) {
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(233,30,140,0.07)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(233,30,140,0.25)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSelected) {
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.03)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.06)";
+              }
+            }}
           >
-            <p className={`font-semibold text-sm truncate ${isSelected ? "text-white" : "text-slate-800"}`}>
-              {client.company_name}
-            </p>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2">
+              {/* Active indicator */}
+              {isSelected && (
+                <div
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: "var(--pink-primary)", boxShadow: "0 0 6px var(--pink-primary)" }}
+                />
+              )}
+              <p
+                className="font-semibold text-sm truncate"
+                style={{ color: isSelected ? "#fff" : "var(--text-primary)" }}
+              >
+                {client.company_name}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
               <span
-                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                  isSelected ? "bg-white/20 text-white" : entityColor
-                }`}
+                className="text-xs px-2 py-0.5 rounded-full font-medium"
+                style={{
+                  background: isSelected ? "rgba(255,255,255,0.12)" : ec.bg,
+                  color: isSelected ? "rgba(255,255,255,0.9)" : ec.text,
+                  border: `1px solid ${isSelected ? "rgba(255,255,255,0.15)" : ec.border}`,
+                }}
               >
                 {client.entity_type}
               </span>
-              <span className={`text-xs ${isSelected ? "text-indigo-200" : "text-slate-400"}`}>
+              <span className="text-xs" style={{ color: isSelected ? "rgba(255,255,255,0.5)" : "var(--text-muted)" }}>
                 {client.country}
               </span>
             </div>
