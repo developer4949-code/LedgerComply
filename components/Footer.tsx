@@ -1,6 +1,6 @@
 "use client";
 
-const DOCS_LINK = "https://notion.so"; // Replace with your Notion docs URL
+const DOCS_LINK = "https://orange-firewall-c29.notion.site/LedgerComply-32bde1660bcd80199ab9cba1015bc333";
 
 export default function Footer() {
   return (
